@@ -1,4 +1,4 @@
-// lib/screens/onboarding_screen.dart
+import 'package:first_app/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import '../widgets/onboarding_page.dart';
@@ -109,15 +109,29 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _navigateToNextScreen() {
-    // Cancel the timer before navigating
     _timer?.cancel();
-    
-    // Here you can navigate to your main app screen
-    // For example:
-    // Navigator.pushReplacement(
-    //   context,
-    //   MaterialPageRoute(builder: (context) => const MainScreen()),
-    // );
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const SignupScreen()),
+    );
+  }
+
+  void _nextPage() {
+    if (_currentPage < _pages.length - 1) {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeIn,
+      );
+    }
+  }
+
+  void _previousPage() {
+    if (_currentPage > 0) {
+      _pageController.previousPage(
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeIn,
+      );
+    }
   }
 
   @override
@@ -137,54 +151,64 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 },
               ),
             ),
-            // Next/Get Started Button
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  TextButton(
-                    onPressed: _currentPage == _pages.length - 1 
-                      ? _navigateToNextScreen 
-                      : () {
-                          _pageController.nextPage(
-                            duration: const Duration(milliseconds: 350),
-                            curve: Curves.easeIn,
-                          );
-                        },
-                    child: Text(
-                      _currentPage == _pages.length - 1 ? 'Get Started' : 'Next',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                  // Left Arrow
+                  IconButton(
+                    onPressed: _currentPage > 0 ? _previousPage : null,
+                    icon: Icon(
+                      Icons.arrow_back_ios,
+                      color: _currentPage > 0
+                          ? Colors.white
+                          : Colors.white.withOpacity(0.3),
+                    ),
+                  ),
+                  // Page Indicators
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      _pages.length,
+                      (index) => Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _currentPage == index
+                              ? Colors.white
+                              : Colors.white.withOpacity(0.4),
+                        ),
                       ),
                     ),
                   ),
+                  // Right Arrow or Get Started
+                  _currentPage == _pages.length - 1
+                      ? TextButton(
+                          onPressed: _navigateToNextScreen,
+                          child: const Text(
+                            'Get Started',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        )
+                      : IconButton(
+                          onPressed: _nextPage,
+                          icon: const Icon(
+                            Icons.arrow_forward_ios,
+                            color: Colors.white,
+                          ),
+                        ),
                 ],
               ),
             ),
-            // Page Indicators
-            Padding(
-              padding: const EdgeInsets.only(bottom: 50.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  _pages.length,
-                  (index) => Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: _currentPage == index
-                          ? Colors.white
-                          : Colors.white.withOpacity(0.4),
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            const SizedBox(height: 30), // Additional bottom padding
           ],
         ),
       ),

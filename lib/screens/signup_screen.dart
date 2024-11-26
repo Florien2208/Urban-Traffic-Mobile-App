@@ -1,6 +1,7 @@
 // lib/screens/signup_screen.dart
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'login_screen.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -13,16 +14,20 @@ class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
-  final List<FocusNode> _focusNodes = List.generate(4, (index) => FocusNode());
+  final List<FocusNode> _focusNodes = List.generate(5, (index) => FocusNode());
   int _currentField = 0;
+
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     for (var node in _focusNodes) {
@@ -41,11 +46,28 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   void _moveToNextField() {
-    if (_currentField < 3) {
+    if (_currentField < 4) {
       setState(() {
         _currentField++;
         _focusNodes[_currentField].requestFocus();
       });
+    }
+  }
+
+  Future<void> _handleGoogleSignUp() async {
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser != null) {
+        // Handle Google Sign-Up logic
+        print('Google User: ${googleUser.displayName}');
+        print('Google Email: ${googleUser.email}');
+        // You would typically send this to your backend for registration
+      }
+    } catch (error) {
+      print('Google Sign-Up Error: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Google Sign-Up Failed: $error')),
+      );
     }
   }
 
@@ -54,8 +76,16 @@ class _SignupScreenState extends State<SignupScreen> {
       // Implement your signup logic here
       print('Name: ${_nameController.text}');
       print('Email: ${_emailController.text}');
+      print('Phone: ${_phoneController.text}');
       print('Password: ${_passwordController.text}');
     }
+  }
+
+  void _navigateToLogin() {
+    Navigator.pushReplacement(
+      context, 
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+    );
   }
 
   @override
@@ -72,13 +102,13 @@ class _SignupScreenState extends State<SignupScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 40),
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
-                    onPressed: () => Navigator.pop(context),
-                  ),
+                  // IconButton(
+                  //   icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  //   onPressed: () => Navigator.pop(context),
+                  // ),
                   const SizedBox(height: 30),
                   const Text(
-                    'Create\nAccount',
+                    'Create Account',
                     style: TextStyle(
                       fontSize: 40,
                       fontWeight: FontWeight.bold,
@@ -117,9 +147,25 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                   const SizedBox(height: 20),
                   _buildInputField(
+                    controller: _phoneController,
+                    label: 'Phone Number',
+                    index: 2,
+                    keyboardType: TextInputType.phone,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your phone number';
+                      }
+                      if (!RegExp(r'^\+?[0-9]{10,14}$').hasMatch(value)) {
+                        return 'Please enter a valid phone number';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  _buildInputField(
                     controller: _passwordController,
                     label: 'Password',
-                    index: 2,
+                    index: 3,
                     isPassword: true,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -135,7 +181,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   _buildInputField(
                     controller: _confirmPasswordController,
                     label: 'Confirm Password',
-                    index: 3,
+                    index: 4,
                     isPassword: true,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -169,6 +215,35 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: TextButton(
+                      onPressed: _navigateToLogin,
+                      child: const Text(
+                        'Already have an account? Login',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: ElevatedButton.icon(
+                      onPressed: _handleGoogleSignUp,
+                      icon: Image.asset(
+                        'assets/google_logo.png', 
+                        height: 24, 
+                        width: 24,
+                      ),
+                      label: const Text('Sign Up with Google'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -177,6 +252,8 @@ class _SignupScreenState extends State<SignupScreen> {
       ),
     );
   }
+
+
 
   Widget _buildInputField({
     required TextEditingController controller,

@@ -26,11 +26,11 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Account'),
-        backgroundColor: const Color(0xFFEFC94C),
-        foregroundColor: Colors.white,
-      ),
+      // appBar: AppBar(
+      //   title: const Text('My Account'),
+      //   backgroundColor: const Color(0xFFEFC94C),
+      //   foregroundColor: Colors.white,
+      // ),
       body: ListView(
         children: [
           if (widget.userEmail != null)

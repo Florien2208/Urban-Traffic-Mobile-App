@@ -5,13 +5,13 @@ class ChargeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Charge'),
-        backgroundColor: const Color(0xFFEFC94C),
-        foregroundColor: Colors.white,
-      ),
-      body: const Center(
+    return const Scaffold(
+      // appBar: AppBar(
+      //   title: const Text('Charge'),
+      //   backgroundColor: const Color(0xFFEFC94C),
+      //   foregroundColor: Colors.white,
+      // ),
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

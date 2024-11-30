@@ -190,7 +190,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ? TextButton(
                           onPressed: _navigateToNextScreen,
                           child: const Text(
-                            'Get Started',
+                            'Start',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 18,

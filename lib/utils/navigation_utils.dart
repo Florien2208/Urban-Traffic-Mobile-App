@@ -11,7 +11,7 @@ class MainNavigationScreen extends StatefulWidget {
 
   const MainNavigationScreen({
     super.key,
-    this.initialIndex = 4,
+    this.initialIndex = 0,
     this.userEmail,
   });
 
